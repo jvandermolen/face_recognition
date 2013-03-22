@@ -44,8 +44,8 @@ if __name__ == '__main__':
 
         t = clock()
         rects = detect(gray, cascade)
-        #vis = img.copy()
-        #draw_rects(vis, rects, (0, 255, 0))
+        vis = img.copy()
+        draw_rects(vis, rects, (0, 255, 0))
         
         for x1, y1, x2, y2 in rects:
             vis_roi = img[y1:y2, x1:x2]
@@ -53,14 +53,14 @@ if __name__ == '__main__':
             print "Face " + str(i)
             cv2.imwrite("dest2/test_" + str(i) + "_" + str(frame) + ".jpg", vis_roi);
             
-        #    roi = gray[y1:y2, x1:x2]
-        #    vis_roi = vis[y1:y2, x1:x2]
-        #    subrects = detect(roi.copy(), nested)
-        #    draw_rects(vis_roi, subrects, (255, 0, 0))
-        #dt = clock() - t
+            roi = gray[y1:y2, x1:x2]
+            vis_roi = vis[y1:y2, x1:x2]
+            subrects = detect(roi.copy(), nested)
+            draw_rects(vis_roi, subrects, (255, 0, 0))
+        dt = clock() - t
 
-        #draw_str(vis, (20, 20), 'time: %.1f ms' % (dt*1000))
-        #cv2.imshow('facedetect', vis)
+        draw_str(vis, (20, 20), 'time: %.1f ms' % (dt*1000))
+        cv2.imshow('facedetect', vis)
 
         if 0xFF & cv2.waitKey(5) == 27:
             break
