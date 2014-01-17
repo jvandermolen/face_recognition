@@ -1,0 +1,46 @@
+import sys, os, pickle
+# append tinyfacerec to module search path
+sys.path.append("..")
+# import numpy and matplotlib colormaps
+import numpy as np
+# import tinyfacerec modules
+from tinyfacerec.model import FisherfacesModel
+
+if __name__ == '__main__':
+
+    if len(sys.argv) != 4:
+        print "USAGE: predict.py </path/to/model> </path/to/data> <rate_data_to_test>"
+        sys.exit()
+
+    pathToModel = sys.argv[1]
+    pathToData = sys.argv[2]
+    testRate = float(sys.argv[3])
+
+    try:
+        model = pickle.load(open(pathToModel, 'rb'))
+    except IOError as e:
+        print filename + ' - ' + "I/O error({0}): {1}".format(e.errno, e.strerror)
+    except:
+        print "Unexpected error:", sys.exc_info()[0]
+        raise
+
+    # read data
+    X, y = [], []
+    for filename in os.listdir(pathToData):
+        try:
+            npzfile = np.load(os.path.join(pathToData, filename))
+            auxX = list(npzfile['X'])
+            auxy = list(npzfile['y'])
+            auxn = len(auxy)
+            nTest = int(auxn*testRate)
+            X.extend(auxX[auxn-nTest:])
+            y.extend(auxy[auxn-nTest:])
+        except IOError as e:
+            print filename + ' - ' + "I/O error({0}): {1}".format(e.errno, e.strerror)
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
+
+    # get a prediction for the data
+    predicted = np.array([model.predict(X[i]) for i in range(len(X))])
+    print np.mean(predicted == y)

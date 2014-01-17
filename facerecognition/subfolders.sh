@@ -1,0 +1,8 @@
+#!/bin/sh
+
+LABEL=0
+for i in `cat subfolders.txt`; do
+    echo "cd /shared/videos/facerecognition/src/py/scripts; python read_save_images_subpath.py \"${i}\" $LABEL \"/shared/videos/facerecognition/data_fotos_por_nino\""|qsub ;
+    LABEL=$((LABEL+1))
+done 
+

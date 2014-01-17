@@ -1,0 +1,41 @@
+
+USAGE: facedetect.py [--cascade <cascade_fn>] [--nested-cascade <cascade_fn>] [--frame-interval <n_of_frames>] [<video_source>]
+
+Face 1 - Frame 14430
+Face 2 - Frame 14460
+Face 3 - Frame 14520
+Face 4 - Frame 14760
+Face 5 - Frame 14820
+Face 6 - Frame 14850
+Face 7 - Frame 14850
+Face 8 - Frame 15420
+Face 9 - Frame 15780
+Face 10 - Frame 15930
+Face 11 - Frame 15960
+Face 12 - Frame 16860
+Face 13 - Frame 16890
+Face 14 - Frame 16920
+Face 15 - Frame 16950
+Face 16 - Frame 18120
+Face 17 - Frame 19320
+Face 18 - Frame 20490
+Face 19 - Frame 34290
+Face 20 - Frame 41790
+Face 21 - Frame 41820
+Face 22 - Frame 41850
+Face 23 - Frame 41910
+Face 24 - Frame 41940
+Face 25 - Frame 42180
+Face 26 - Frame 42450
+Face 27 - Frame 42720
+Face 28 - Frame 46800
+Face 29 - Frame 51720
+Face 30 - Frame 52200
+Face 31 - Frame 52260
+Face 32 - Frame 52350
+Face 33 - Frame 52350
+Face 34 - Frame 52380
+Face 35 - Frame 52410
+Face 36 - Frame 52410
+number of faces: 36
+elpased time: 0 hours, 14 minutes, 23.39 seconds.

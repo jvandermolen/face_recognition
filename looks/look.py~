@@ -1,0 +1,33 @@
+class look(object):
+    def __init__(self, interaction=None, holder=None, time=None):
+        self.interaction = interaction
+        self.holder = holder
+        self.time = time
+
+class rut(object):
+    def __init__(self, *args):
+        if len(args) == 1: self.__setup1(*args)
+        elif len(args) == 2: self.__setup2(*args)
+        
+    def  __setup1(self, string):
+        #format 12.345.678-9 or 12345678-9 or 123456789
+        string = string.replace('.','')
+        string = string.replace('-','')
+        self.number = int(string[:-1])
+        self.vd = str.lower(string[-1])
+
+    def  __setup2(self, number, vd):
+        self.number = number
+        self.vd = str.lower(str(vd))
+
+    def toStr(self):
+        return str(self.number) + '-' + self.vd
+
+class person(object):
+    def __init__(self, names=None, lastname1=None, lastname2=None, gender=None, rut=None, role=None):
+        self.names = names
+        self.lastname1 = lastname1
+        self.lastname2 = lastname2
+        self.gender = gender
+        self.rut = rut
+        self.role = role
