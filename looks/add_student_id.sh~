@@ -1,5 +1,0 @@
-#!/bin/sh
-
-for i in `cat faces_folders.txt`; do
-    echo "$(basename $i)";
-done 
