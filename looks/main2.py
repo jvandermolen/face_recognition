@@ -6,10 +6,10 @@ filename = sys.argv[1]
 
 la = looksAnalysis()
 
-la.setTimetable('horario2.csv', 'bloques2.csv')
-la.setPeople('personas.csv')
-la.setVideos('duracion_videos_completo.csv')
-la.setExactLooks('faces_folders2.txt', 30)
+la.setTimetable('./resources/horario2.csv', './resources/bloques2.csv')
+la.setPeople('./resources/personas.csv')
+la.setVideos('./resources/duracion_videos_completo.csv')
+la.setExactLooks('./resources/faces_folders2.txt', 30)
 
 t0 = '080000'
 t1 = '160000'

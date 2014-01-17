@@ -28,6 +28,8 @@ public/assets
 *.avi
 *.MOV
 *.wav
-dest/*.jpg
-dest2/*.jpg
+*.jpg
 
+/looks/databases
+/looks/matrices
+/looks/matrices_avelio

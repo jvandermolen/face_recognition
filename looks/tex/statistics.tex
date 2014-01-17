@@ -1,0 +1,372 @@
+\documentclass[spanish]{article}
+\usepackage[spanish, activeacute]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amssymb}
+\usepackage{amsmath,latexsym,amsthm}
+\usepackage{graphicx}
+
+\begin{document}
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+n    \\ \hline
+16740\\ \hline
+\end{tabular}
+\caption{total de observaciones}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+Interaccion & frecuencia & porcentaje   \\ \hline
+no          &      12968 &          77.5\\ \hline
+si          &       3772 &          22.5\\ \hline
+\end{tabular}
+\caption{frecuencia de interacciones}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+rol y sexo & tiempo (minutos) & porcentaje   \\ \hline
+profesor   &             3420 &          20.4\\ \hline
+alumna     &             5760 &          34.4\\ \hline
+alumno     &             7560 &          45.2\\ \hline
+\end{tabular}
+\caption{tiempo estudiado segun rol y sexo}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+modulo & tiempo (minutos) & porcentaje   \\ \hline
+1\_2    &             3960 &          23.7\\ \hline
+3\_4    &             5940 &          35.5\\ \hline
+5\_6    &             2970 &          17.7\\ \hline
+7\_8    &             3870 &          23.1\\ \hline
+\end{tabular}
+\caption{tiempo estudiado segun hora del dia}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+dia       & tiempo (minutos) & porcentaje   \\ \hline
+Lunes     &             4770 &          28.5\\ \hline
+Martes    &             4950 &          29.6\\ \hline
+Miercoles &             2700 &          16.1\\ \hline
+Jueves    &             2340 &          14.0\\ \hline
+Viernes   &             1980 &          11.8\\ \hline
+\end{tabular}
+\caption{tiempo estudiado segun dia de la semana}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+asignatura  & tiempo (minutos) & porcentaje   \\ \hline
+Arte        &             2070 &          12.4\\ \hline
+Ciencias    &             2790 &          16.7\\ \hline
+Ed\_fisica   &              360 &           2.2\\ \hline
+Historia    &             1980 &          11.8\\ \hline
+Integra     &             1620 &           9.7\\ \hline
+Lenguaje    &             2250 &          13.4\\ \hline
+Mate\_Labo   &              360 &           2.2\\ \hline
+Matematica  &             2880 &          17.2\\ \hline
+Religion    &              630 &           3.8\\ \hline
+Tecnologica &              450 &           2.7\\ \hline
+            &             1350 &           8.1\\ \hline
+\end{tabular}
+\caption{tiempo estudiado segun asignatura}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+sujeto & tiempo (minutos) & porcentaje   \\ \hline
+     0 &             3420 &          20.4\\ \hline
+     1 &              630 &           3.8\\ \hline
+     2 &              450 &           2.7\\ \hline
+     3 &              360 &           2.2\\ \hline
+     4 &              360 &           2.2\\ \hline
+     5 &              270 &           1.6\\ \hline
+     6 &              270 &           1.6\\ \hline
+     7 &              450 &           2.7\\ \hline
+     8 &              630 &           3.8\\ \hline
+     9 &              450 &           2.7\\ \hline
+    10 &              270 &           1.6\\ \hline
+    11 &              450 &           2.7\\ \hline
+    12 &                0 &           0.0\\ \hline
+    13 &              270 &           1.6\\ \hline
+    14 &              180 &           1.1\\ \hline
+    15 &              720 &           4.3\\ \hline
+    16 &              360 &           2.2\\ \hline
+    17 &              360 &           2.2\\ \hline
+    18 &              450 &           2.7\\ \hline
+    19 &              360 &           2.2\\ \hline
+    20 &                0 &           0.0\\ \hline
+    21 &              540 &           3.2\\ \hline
+    22 &                0 &           0.0\\ \hline
+    23 &              270 &           1.6\\ \hline
+    24 &              360 &           2.2\\ \hline
+    25 &              450 &           2.7\\ \hline
+    26 &              180 &           1.1\\ \hline
+    27 &              630 &           3.8\\ \hline
+    28 &              450 &           2.7\\ \hline
+    29 &              810 &           4.8\\ \hline
+    30 &              270 &           1.6\\ \hline
+    31 &              720 &           4.3\\ \hline
+    32 &              450 &           2.7\\ \hline
+    33 &              270 &           1.6\\ \hline
+    34 &              270 &           1.6\\ \hline
+    35 &              180 &           1.1\\ \hline
+    36 &              180 &           1.1\\ \hline
+\end{tabular}
+\caption{minutos de uso de los lentes por sujeto}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+rol      & tiempo de grabacion & media          & desv. est.    \\ \hline
+alumnos  &               13320 &          0.231 &          0.421\\ \hline
+profesor &                3420 &          0.204 &          0.403\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.001} \\ \hline
+\end{tabular}
+\caption{promedio segun rol}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+sexo      & tiempo de grabacion & media          & desv. est.    \\ \hline
+femenino  &                5760 &          0.229 &          0.420\\ \hline
+masculino &                7560 &          0.232 &          0.422\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.622} \\ \hline
+\end{tabular}
+\caption{promedio segun sexo del alumno}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+grupo   & tiempo de grabacion & media          & desv. est.    \\ \hline
+primero &                2430 &          0.225 &          0.418\\ \hline
+segundo &                7920 &          0.242 &          0.428\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.084} \\ \hline
+\end{tabular}
+\caption{alumnos: promedio segun enfonque de la asignatura}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+grupo   & tiempo de grabacion & media          & desv. est.    \\ \hline
+primero &                 720 &          0.190 &          0.393\\ \hline
+segundo &                1980 &          0.207 &          0.405\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.337} \\ \hline
+\end{tabular}
+\caption{profesor: promedio segun enfonque de la asignatura}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+grupo     & tiempo de grabacion & media          & desv. est.    \\ \hline
+1\_2 y 3\_4 &                8010 &          0.236 &          0.424\\ \hline
+5\_6 y 7\_8 &                5310 &          0.223 &          0.416\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.093} \\ \hline
+\end{tabular}
+\caption{alumnos: promedio segun bloque horario}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+grupo     & tiempo de grabacion & media          & desv. est.    \\ \hline
+1\_2 y 3\_4 &                1890 &          0.212 &          0.408\\ \hline
+5\_6 y 7\_8 &                1530 &          0.195 &          0.397\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.242} \\ \hline
+\end{tabular}
+\caption{profesor: promedio segun bloque horario}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+promedio de notas & tiempo de grabacion & media          & desv. est.    \\ \hline
+$\leq$ 5.17           &                6120 &          0.228 &          0.419\\ \hline
+$>$ 5.17            &                7200 &          0.233 &          0.423\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.435} \\ \hline
+\end{tabular}
+\caption{alumnos bajo el promedio de notas versus sobre promedio de notas}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+promedio de notas & tiempo de grabacion & media          & desv. est.    \\ \hline
+Bajo              &                4500 &          0.238 &          0.426\\ \hline
+Alto              &                5130 &          0.237 &          0.425\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.970} \\ \hline
+\end{tabular}
+\caption{alumnos tercio con peores notas versus tercio con mejores notas}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+prom. de evaluacion & tiempo de grabacion & media          & desv. est.    \\ \hline
+$\leq$ 4.52             &                5490 &          0.232 &          0.422\\ \hline
+$>$ 4.52              &                5760 &          0.231 &          0.421\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.885} \\ \hline
+\end{tabular}
+\caption{alumnos bajo el promedio de evaluacion versus sobre promedio de evaluacion}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+prom. de evaluacion & tiempo de grabacion & media          & desv. est.    \\ \hline
+Bajo                &                5490 &          0.232 &          0.422\\ \hline
+Alto                &                1440 &          0.233 &          0.423\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.951} \\ \hline
+\end{tabular}
+\caption{alumnos tercio con peores evaluaciones versus tercio con mejores evaluaciones}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+sexo      & tiempo de grabacion & media          & desv. est.    \\ \hline
+Femenino  &                 900 &          0.283 &          0.451\\ \hline
+Masculino &                1440 &          0.270 &          0.444\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.487} \\ \hline
+\end{tabular}
+\caption{interacciones segun sexo en matematicas}
+\end{center}
+\end{table}
+\clearpage
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+sexo      & tiempo de grabacion & media          & desv. est.    \\ \hline
+Femenino  &                 450 &          0.209 &          0.407\\ \hline
+Masculino &                1440 &          0.243 &          0.429\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.136} \\ \hline
+\end{tabular}
+\caption{interacciones segun sexo en lenguage}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+sexo      & tiempo de grabacion & media          & desv. est.    \\ \hline
+Femenino  &                 720 &          0.224 &          0.417\\ \hline
+Masculino &                 810 &          0.251 &          0.433\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.216} \\ \hline
+\end{tabular}
+\caption{interacciones segun sexo en artes}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|r|}
+\hline
+promedio de notas & tiempo de grabacion & media          & desv. est.    \\ \hline
+Bajo              &                 990 &          0.259 &          0.438\\ \hline
+Alto              &                 630 &          0.289 &          0.453\\ \hline
+\multicolumn{4}{|c|}{p-valor: 0.181} \\ \hline
+\end{tabular}
+\caption{interacciones segun promedio de matematicas en matematicas}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+sujeto & tiempo (minutos) & promedio de interacciones\\ \hline
+     0 &             3420 &                      20.4\\ \hline
+     1 &              630 &                      20.0\\ \hline
+     2 &              450 &                      23.8\\ \hline
+     3 &              360 &                      16.4\\ \hline
+     4 &              360 &                      24.7\\ \hline
+     5 &              270 &                      20.4\\ \hline
+     6 &              270 &                      16.3\\ \hline
+     7 &              450 &                      26.4\\ \hline
+     8 &              630 &                      19.7\\ \hline
+     9 &              450 &                      21.6\\ \hline
+    10 &              270 &                      23.7\\ \hline
+    11 &              450 &                      23.8\\ \hline
+    12 &                0 &                       nan\\ \hline
+    13 &              270 &                      25.2\\ \hline
+    14 &              180 &                      23.3\\ \hline
+    15 &              720 &                      24.2\\ \hline
+    16 &              360 &                      26.1\\ \hline
+    17 &              360 &                      20.6\\ \hline
+    18 &              450 &                      22.4\\ \hline
+    19 &              360 &                      23.6\\ \hline
+    20 &                0 &                       nan\\ \hline
+    21 &              540 &                      21.1\\ \hline
+    22 &                0 &                       nan\\ \hline
+    23 &              270 &                      25.2\\ \hline
+    24 &              360 &                      16.1\\ \hline
+    25 &              450 &                      23.6\\ \hline
+    26 &              180 &                      20.6\\ \hline
+    27 &              630 &                      24.8\\ \hline
+    28 &              450 &                      21.3\\ \hline
+    29 &              810 &                      22.6\\ \hline
+    30 &              270 &                      33.0\\ \hline
+    31 &              720 &                      23.9\\ \hline
+    32 &              450 &                      24.2\\ \hline
+    33 &              270 &                      29.3\\ \hline
+    34 &              270 &                      27.0\\ \hline
+    35 &              180 &                      27.8\\ \hline
+    36 &              180 &                      30.0\\ \hline
+\end{tabular}
+\caption{promedio de interacciones por sujeto}
+\end{center}
+\end{table}
+
+
+\end{document}

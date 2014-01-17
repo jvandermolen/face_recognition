@@ -56,7 +56,7 @@ def print_ttest(title, sample1, sample2, header, values, tex=None):
 
 la.looks = [l for l in la.looks if l.block in ['1_2', '3_4', '5_6', '7_8']]
 
-tex = open('statistics.tex', 'w')
+tex = open('./tex/statistics.tex', 'w')
 
 pre = '\\documentclass[spanish]{article}\n\\usepackage[spanish, activeacute]{babel}\n\\usepackage[latin1]{inputenc}\n\\usepackage{amssymb}\n\\usepackage{amsmath,latexsym,amsthm}\n\\usepackage{graphicx}\n\n\\begin{document}\n'
 tex.write(pre)
