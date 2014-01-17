@@ -1,0 +1,135 @@
+from datetime import datetime
+import numpy as np
+import ndsparse as sp
+
+class student(object):
+    def __init__(self, _id_=None, name=None, lastname=None, gender=None):
+        self._id_ = _id_
+        self.name = name
+        self.lastname = lastname
+        self.gender = gender
+
+class clip(object):
+    def __init__(self, _id_, duration):
+        self._id_ = _id_
+        self.duration = duration
+
+class video(object):
+    def __init__(self, _id_=None, date=None, block=None, subject=None, observer=None, roomPos=None, clips=[], duration=None):
+        self._id_ = _id_
+        self.date = date
+        self.block = block
+        self.subject = subject
+        self.observer = observer
+        self.roomPos = roomPos
+        self.clips = clips
+        self.duration = duration
+
+    def weekday(self):
+        return self.date.isoweekday()
+
+class videoReview(object):
+    def __init__(self, videos=None, times=None):
+        self.videos = videos
+        self.times = times
+
+        if self.videos is None:
+            self.videos = []
+
+    def getObject(self, variable):
+        ans = None
+        if variable == 'videos':
+            ans = 'video'
+        return ans
+
+    def getExpression(self, columns, actions):
+        data = ["row[" + str(column) + "]" for column in columns]
+        if len(actions) == 0:
+            data = data[0]
+        else:
+            for action in actions:
+                if action == '+' or action == 'concatenate':
+                    data = '+'.join(data)
+                elif action == 'setClips':
+                    letters = map(chr, range(97, 123))
+                    letters = letters[:len(data)]
+                    data = ['clip(\"' + l + '\",' + d + ')' for l, d in zip(letters, data)]
+                    data = ','.join(data)
+                    data = '[' + data + ']'
+                elif action == 'int':
+                    data = ['int(' + d + ')' for d in data]
+                elif action == 'eval':
+                    data = data[0] 
+                elif action == 'setDate':
+                    data = 'datetime(' + ','.join(data) + ')'
+                elif action == 'setObserver':
+                    data = 'student(' + ','.join(data) + ')' #se crea muchas veces el mismo alumno
+                elif action == 'pair':
+                    data = data[0]
+                    data = '(' + 'int(' + data + '[:' + data + '.index(\".\")])' + ',' + 'int(' + data + '[' + data + '.index(\".\")+1:])' + ')'
+        return data
+
+    def _get_(self, variable, attribute):
+        exec "l = [var." + attribute + " for var in self." + variable + "]"
+        return l
+
+    def _set_(self, filename, variable, attributes, key='_id_'):
+        ids = self._get_(variable, key)
+        colId = attributes[zip(*attributes)[0].index(key)][1][0]
+        with open(filename, 'r') as f:
+            for row in f.readlines()[1:]:
+                row = row.split(',')
+                if row[colId] in ids:
+                    iId = ids.index(row[colId])
+                    for attribute, columns, actions in attributes:
+                        exec "self." + variable + "[" + str(iId) + "]." + attribute + "=" + self.getExpression(columns, actions)
+                else:
+                    arguments = [attribute + "=" + self.getExpression(columns, actions) for attribute, columns, actions in attributes]
+                    arguments = ','.join(arguments)
+                    exec "self." + variable + ".append(" + self.getObject(variable) + "(" + arguments + "))"
+
+    def save(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self, f)
+
+    def load(self, filename):
+        with open(filename, 'rb') as f:
+            self.__dict__ = pickle.load(f).__dict__
+
+    def computeTimes(self):
+        observers = np.unique([v.observer._id_ for v in self.videos])
+        weekdays = np.unique([v.weekday() for v in self.videos])
+        blocks = np.unique([v.block for v in self.videos])
+        subjects = np.unique([v.subject for v in self.videos])
+
+        nobs = len(observers)
+        nwds = len(weekdays)
+        nbls = len(blocks)
+        nsbs = len(subjects)
+
+        self.times = sp.ndsparse((nobs, nwds, nbls, nsbs))
+
+        for v in self.videos:
+            iObs = list(observers).index(v.observer._id_)
+            iWdy = list(weekdays).index(v.weekday())
+            iBlk = list(blocks).index(v.block)
+            iSub = list(subjects).index(v.subject)
+            self.times[(iObs, iWdy, iBlk, iSub)] += v.duration
+
+    def timesFor(self, var1, var2=None):
+        #guardar en algun lado que dimension corresponde a quien, por mientras:
+        dims = ['observers', 'weekdays', 'blocks', 'subjects']
+        d1 = dims.index(var1)
+        if var2 is None:
+            d2 = None
+        else:
+            d2 = dims.index(var2)
+        times = self.times.dense()
+        ax = tuple([i for i in range(len(dims)) if i not in [d1, d2]])
+        times = np.sum(times, axis=ax)
+        return times
+
+    def toInt(self, variable, attribute):
+        atts = self._get_(variable, attribute)
+        for i in xrange(len(atts)):
+            exec 'self.' + variable + '[' + str(i) + '].' + attribute + '=int(atts[' + str(i) + '])'

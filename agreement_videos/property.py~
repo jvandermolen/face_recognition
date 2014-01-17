@@ -1,0 +1,5 @@
+class prop(object):
+    def __init__(self, name, data):
+        self.name = name
+        self.columns = columns
+        self.data = data

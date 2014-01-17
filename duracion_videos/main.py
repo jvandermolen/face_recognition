@@ -1,0 +1,55 @@
+from videos import *
+import numpy as np
+from result import *
+
+if __name__ == '__main__':
+    
+    vr = videoReview()
+    
+    attributes = [('_id_',[0],[]), ('date',[1,2,3,13,14,15],['int','setDate']), ('block',[6],['int','eval']), ('subject',[7],[])]
+    attributes.extend([('observer',[8,9,10,11],['setObserver']), ('roomPos',[12],['pair']), ('clips',[17,18,19,20],['setClips'])])
+    attributes.extend([('duration',[21],['int','eval'])])
+    vr._set_('duracion_videos_completo.csv','videos',attributes)
+    vr.toInt('videos','observer._id_')
+    print vr.videos[2]._id_
+    print vr.videos[2].date
+    print vr.videos[2].observer.name
+    print vr.videos[2].subject
+    
+    # d = {'LU':'Monday', 'MA':'Tuesday', 'MI':'Wednesday', 'JU':'Thursday', 'VI':'Friday', 'SA':'Saturday', 'DO':'Sunday'}
+    # wd = [v.date.strftime('%A') == d[v.weekday] for v in vr.videos]
+    # print wd.count(False)
+
+    vr.computeTimes()
+
+    times1 = vr.timesFor('observers')
+    hheaders1 = ['alumno']
+    hheaders1.extend(list(np.unique(vr._get_('videos','observer._id_'))))
+    vheaders1 = ['segundos']
+
+    times2 = vr.timesFor('weekdays')
+    hheaders2 = ['dia']
+    hheaders2.extend(list(np.unique(vr._get_('videos','weekday()'))))
+    vheaders2 = ['segundos']
+
+    times3 = vr.timesFor('blocks')
+    hheaders3 = ['bloque']
+    hheaders3.extend(list(np.unique(vr._get_('videos','block'))))
+    vheaders3 = ['segundos']
+
+    times4 = vr.timesFor('subjects')
+    hheaders4 = ['materia']
+    hheaders4.extend(list(np.unique(vr._get_('videos','subject'))))
+    vheaders4 = ['segundos']
+    
+    times5 = vr.timesFor('observers','subjects')
+    hheaders5 = ['alumno\\materia']
+    hheaders5.extend(list(np.unique(vr._get_('videos','subject'))))
+    vheaders5 = list(np.unique(vr._get_('videos','observer._id_')))
+
+    hheaders = [hheaders1,hheaders2,hheaders3,hheaders4,hheaders5]
+    vheaders = [vheaders1,vheaders2,vheaders3,vheaders4,vheaders5]
+    times = [times1,times2,times3,times4,times5]
+
+    res = result('tiempos de grabacion', hheaders, vheaders, times)
+    res.toExcel('tiempos.xls')    

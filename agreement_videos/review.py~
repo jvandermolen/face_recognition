@@ -1,0 +1,161 @@
+import numpy as np
+import xlrd
+import sys
+from properties import prop
+
+class review(object):
+    def __init__(self, excelFile, properties):
+        r = ['Viviana', 'Ximena', 'Ragnar', 'Manuela', 'EmocionesCIAE_M', 'EmocionesCIAE_R', 'Picassa', 'OpenCV']
+        self.reviewers = {i: r[i] for i in range(len(r))}
+        self.videos = {}
+        self.properties = []
+        self.prop = []
+        self.setData(excelFile, properties)
+
+    def setData(self, excelFile, properties):
+        #open excel
+        try:
+            wb = xlrd.open_workbook(excelFile)
+            #open the first sheet (headers in first row)
+            sh = wb.sheet_by_index(0)
+            #videos should be in first column
+            v = sh.col_values(0)[1:]
+            videos = {i: v[i] for i in range(len(v))}
+
+            propList = []
+            
+            for name, columns in properties:
+                columns = self.idRevToColumns(columns)
+                currentProp = prop(name, columns, sh)
+                propList.append(currentProp)
+            self.videos = videos
+            self.properties = propList
+            self.prop = self.properties
+        except IOError as e:
+            print excelFile + ' - ' + "I/O error({0}): {1}".format(e.errno, e.strerror)
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise
+        
+    def idRevToColumns(self, columns):
+        newColumns = []
+        for rev, colList, actions in columns:
+            idRev = self.getIdRev(rev)
+            newColumns.append( (idRev, colList, actions) )
+        return newColumns
+
+    def getIdRev(self, rev):
+        for key in self.reviewers.keys():
+            if self.reviewers[key] == rev:
+                return key
+        return None
+
+    def getIdVideo(self, vid):
+        for key in self.videos.keys():
+            if self.videos[key] == vid:
+                return key
+        return None
+
+    def getPropIndex(self, propName):
+        i = 0
+        for prop in self.prop:
+            if prop.getName() == propName:
+                return i
+            i += 1
+        return None 
+
+    def getDatum(self, prop, rev, vid):
+        if type(prop) is str:
+            prop = self.getPropIndex(prop)
+        if type(rev) is str:
+            rev = self.getIdRev(rev)
+        if type(vid) is str:
+            vid = self.getIdVideo(vid)
+        prop = self.prop[prop]
+        return prop.getDatum(rev, vid)
+
+    def getData(self, prop):
+        if type(prop) is str:
+            prop = self.getPropIndex(prop)
+        return self.prop[prop].getData()
+
+    def getReviewers(self, prop=None, names=0):
+        if prop == None and names:
+            revs = self.reviewers.values()
+        if prop == None and not names:
+            revs = self.reviewers.keys()
+        if type(prop) is str:
+            prop = self.getPropIndex(prop)
+        if type(prop) is int:        
+            revs = self.prop[prop].getReviewers()
+            if names:
+                revs = [self.reviewers[rev] for rev in revs]
+        return revs
+
+    def agreement(self, prop, idRevs, method):
+        if idRevs == ':':
+            idRevs = self.getReviewers(prop=prop)
+        n = len(idRevs)
+        data = [self.getDatum(prop, idRev, ':') for idRev in idRevs]
+
+        result = np.empty([n, n])
+        for i in range(n):
+            for j in range(n):
+                if i == j:
+                    result[i][j] = 1
+                elif i < j:
+                    data1 = data[i]
+                    data2 = data[j]
+                    if method == 'percentage' or method == '%':
+                        result[i][j] = np.mean(data1 == data2)
+                else:
+                    result[i][j] = result[j][i]
+        if n == 2:
+            result = result[0][1]
+        return result
+
+    def disagreement(self, prop, idRevs, method):
+        if idRevs == ':':
+            idRevs = self.getReviewers(prop=prop)
+        n = len(idRevs)
+        data = [self.getDatum(prop, idRev, ':') for idRev in idRevs]
+
+        result = np.empty([n, n])
+        for i in range(n):
+            for j in range(n):
+                if i == j:
+                    result[i][j] = 0
+                else:
+                    data1 = data[i][0]
+                    data2 = data[j][0]
+                    if method == 'percentage' or method == '%':
+                        result[i][j] = np.mean(data1 < data2)
+
+        return result
+
+    def add(self, rev2):
+        for prop in rev2.properties:
+            index = self.getPropIndex(prop.getName())
+            if index != None:
+                self.properties[index].add(prop)
+            else:
+                self.properties.append(prop)
+        self.prop = self.properties
+
+    def videosOfDisagreement(self, prop, idRevs):
+        if idRevs == ':':
+            idRevs = self.getReviewers(prop=prop)
+        n = len(idRevs)
+        data = [self.getDatum(prop, idRev, ':') for idRev in idRevs]
+
+        videos = [range(n) for i in range(n)]
+        for i in range(n):
+            for j in range(n):
+                if i == j:
+                    videos[i][j] = []
+                else:
+                    data1 = data[i][0]
+                    data2 = data[j][0]
+                    videos[i][j] = [self.videos[a] for a in range(len(data1)) if data1[a] < data2[a]]
+
+        return videos
