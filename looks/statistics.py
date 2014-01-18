@@ -40,11 +40,11 @@ def print_result(title, res, decimals=1, tex=None, write=True):
 
 def print_ttest(title, sample1, sample2, header, values, tex=None):
     means = [np.mean(sample1), np.mean(sample2)]
-    stds = [np.std(sample1), np.std(sample2)]
     freqs = [len(sample1), len(sample2)]
+    sems = [np.std(sample1)/np.sqrt(freqs[0]), np.std(sample2)/np.sqrt(freqs[1])]
     statistic, pvalue = stats.ttest_ind(sample1, sample2)
-    matrix = [[header, 'tiempo de grabacion', 'media', 'desv. est.']]
-    matrix.extend([[v, n, m, s] for v, n, m, s in zip(values, freqs, means, stds)])
+    matrix = [[header, 'tiempo de grabacion', 'media', 'error. est.']]
+    matrix.extend([[v, n, m, s] for v, n, m, s in zip(values, freqs, means, sems)])
     t, nCols = print_result(title, matrix, decimals=3 , tex=tex, write=False)
     l = 'p-valor: %2.3f' %pvalue
     print l
