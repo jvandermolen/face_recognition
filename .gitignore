@@ -33,3 +33,6 @@ public/assets
 /looks/databases
 /looks/matrices
 /looks/matrices_avelio
+/facerecognition/models
+/facerecognition/data_fotos_por_nino
+/facerecognition/data_perfiles
