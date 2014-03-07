@@ -15,5 +15,5 @@ response = unirest.post("https://lambda-face-recognition.p.mashape.com/album",
 print 'response body: ' + str(response.body)
 with open(albumname, 'w') as f:
     f.write('album: ' + response.body['album'] + '\n')
-    f.write('album key: ' + response.body['albumkey'])
+    f.write('albumkey: ' + response.body['albumkey'])
 print 'creado archivo ' + albumname
