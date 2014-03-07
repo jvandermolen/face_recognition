@@ -1,6 +1,6 @@
 import unirest, pickle
 
-albumname = "santarita_01"
+albumname = "santarita01"
 key = "c2vwcOykEqC8DRjcHNsLkwIy3yNjUVrL"
 albumkey = ''
 
