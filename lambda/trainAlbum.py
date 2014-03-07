@@ -1,11 +1,12 @@
 import unirest
 
 albumname = "santarita_01"
-key = "lzVlO8AVkc27FsBOYlBVI3yRcHlW6sHK"
+key = "c2vwcOykEqC8DRjcHNsLkwIy3yNjUVrL"
 albumkey = ''
 
-pathsfile = 'fotos_train.csv'
+pathsfile = 'fotos_por_nino_train.csv'
 
+print 'leyendo ' + albumname
 with open(albumname, 'r') as f:
     for l in f.readlines():
         l = l.replace('\n', '')
@@ -18,6 +19,7 @@ if albumkey == '':
 else:
     print 'albumkey obtenida'
 
+print 'leyendo ' + pathsfile
 with open(pathsfile, 'r') as f:
     for l in f.readlines():
         l = l.replace('\n', '')
@@ -35,11 +37,12 @@ with open(pathsfile, 'r') as f:
             "entryid": personid,
             "files": open(imgpath, mode="r"),
           }
-        );
+        )
+        print 'response body: ' + str(response.body)
 
 response = unirest.get("https://lambda-face-recognition.p.mashape.com/album_rebuild?album=" + album + "&albumkey=" + albumkey,
   
   headers={
     "X-Mashape-Authorization": key
   }
-);
+)

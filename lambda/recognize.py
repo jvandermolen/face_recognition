@@ -1,12 +1,13 @@
 import unirest, pickle
 
 albumname = "santarita_01"
-key = "lzVlO8AVkc27FsBOYlBVI3yRcHlW6sHK"
+key = "c2vwcOykEqC8DRjcHNsLkwIy3yNjUVrL"
 albumkey = ''
 
-pathsfile = 'fotos_test.csv'
+pathsfile = 'fotos_por_nino_test_free.csv'
 resultsfile = 'results.pkl'
 
+print 'leyendo ' + albumname
 with open(albumname, 'r') as f:
     for l in f.readlines():
         l = l.replace('\n', '')
@@ -21,6 +22,7 @@ else:
 
 results = []
 
+print 'leyendo ' + pathsfile
 with open(pathsfile, 'r') as f:
     for l in f.readlines():
         l = l.replace('\n', '')
@@ -38,8 +40,8 @@ with open(pathsfile, 'r') as f:
             "files": open(imgpath, mode="r"),
           }
         );
-
-        response['actualid'] = personid
+        response.body['actualid'] = personid
+        print 'response body: ' + str(response.body)
         results.append(response)
 
 print 'guardando resultados'

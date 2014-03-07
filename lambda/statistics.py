@@ -5,7 +5,7 @@ resultsfile = 'results.pkl'
 
 results = pickle.load(open(resultsfile, 'rb'))
 
-ids = [ ( r['actualid'], [r['photos'][0]['tags'][0]['uids'][0]['predicted'] ) for r in results ]
+ids = [ ( r.body['actualid'], [r.body['photos'][0]['tags'][0]['uids'][0]['predicted'] ) for r in results ]
 actual, predicted = zip(*ids)
 accuracy =  np.mean( actual == predicted )*100
 
