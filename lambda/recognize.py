@@ -4,8 +4,8 @@ albumname = "santarita01"
 key = "c2vwcOykEqC8DRjcHNsLkwIy3yNjUVrL"
 albumkey = ''
 
-pathsfile = 'fotos_por_nino_test_free.csv'
-resultsfile = 'results.pkl'
+pathsfile = '../facerecognition/fotos_por_nino_test_free.csv'
+resultsfile = 'results_' + albumname + '.pkl'
 
 print 'leyendo ' + albumname
 with open(albumname, 'r') as f:

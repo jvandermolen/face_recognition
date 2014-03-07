@@ -1,7 +1,8 @@
 import pickle
 import numpy as np
 
-resultsfile = 'results.pkl'
+albumname = "santarita01"
+resultsfile = 'results_' + albumname + '.pkl'
 
 results = pickle.load(open(resultsfile, 'rb'))
 
