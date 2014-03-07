@@ -4,7 +4,7 @@ albumname = "santarita01"
 key = "c2vwcOykEqC8DRjcHNsLkwIy3yNjUVrL"
 albumkey = ''
 
-#pathsfile = '../facerecognition/fotos_por_nino_train.csv'
+pathsfile = '../facerecognition/fotos_por_nino_train.csv'
 
 print 'leyendo ' + albumname
 with open(albumname, 'r') as f:
