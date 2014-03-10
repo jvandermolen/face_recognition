@@ -40,7 +40,7 @@ with open(pathsfile, 'r') as f:
         )
         print 'response body: ' + str(response.body)
 
-response = unirest.get("https://lambda-face-recognition.p.mashape.com/album_rebuild?album=" + album + "&albumkey=" + albumkey,
+response = unirest.get("https://lambda-face-recognition.p.mashape.com/album_rebuild?album=" + albumname + "&albumkey=" + albumkey,
   
   headers={
     "X-Mashape-Authorization": key
