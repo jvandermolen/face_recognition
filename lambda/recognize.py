@@ -35,7 +35,7 @@ with open(pathsfile, 'r') as f:
             "X-Mashape-Authorization": key
           },
           params={ 
-            "album": album,
+            "album": albumname,
             "albumkey": albumkey,
             "files": open(imgpath, mode="r"),
           }
