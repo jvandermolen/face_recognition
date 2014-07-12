@@ -19,6 +19,5 @@ import numpy as np
 #m = la.matlab2numpy('./matrices/1019.txt', True)
 #print m[242]
 
-la = looksAnalysis('la_ocv_v2_sininfo.pkl')
-looks = [l for l in la.looks if l.date_time.isoweekday() == 4]
-print np.unique([l.observer._id for l in looks])
+la = looksAnalysis('save/la_ocv_v3.pkl')
+print la.looks[60].observer._id

@@ -9,7 +9,7 @@ la = looksAnalysis()
 la.setTimetable('./resources/horario2.csv', './resources/bloques2.csv')
 la.setPeople('./resources/personas.csv')
 la.setVideos('./resources/duracion_videos_completo.csv')
-la.setExactLooks('./resources/faces_folders2.txt', 30)
+la.setExactLooks('./resources/faces_folders_fake.txt', 30)
 
 t0 = '080000'
 t1 = '160000'

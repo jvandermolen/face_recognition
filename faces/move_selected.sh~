@@ -1,6 +1,0 @@
-#!/bin/sh
-
-for i in $( cat 'selected.txt' ); do
-    move $i ./sample
-done
-

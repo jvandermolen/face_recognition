@@ -55,6 +55,26 @@ def print_ttest(title, sample1, sample2, header, values, tex=None):
         tex.write(t)
 
 la.looks = [l for l in la.looks if l.block in ['1_2', '3_4', '5_6', '7_8']]
+for l in la.looks:
+    if l.interaction ==1 and l.observed._id in ['SIN', 'MARCADOR', 'FOTO']:
+        l.interaction = 0
+
+oldLooks = la.looks
+looks = unique([(l.observer,'obd',l.date_time,l.block,l.subject) for l in la.looks])
+la.looks = []
+for t in looks:
+    auxLook = look()
+    auxLook.observer = t[0]
+    auxLook.observed = t[1]
+    auxLook.date_time = t[2]
+    auxLook.block = t[3]
+    auxLook.subject = t[4]
+    if sum([l.interaction for l in oldLooks if l.observer == t[0] and l.date_time == t[2]]) > 0:
+        auxLook.interaction = 1
+    else:
+        auxLook.interaction = 0
+    la.looks.append(auxLook)
+
 
 tex = open('./tex/statistics.tex', 'w')
 
@@ -171,7 +191,7 @@ second = [l.interaction for l in la.looks if int(l.observer._id) == 0 and l.bloc
 print_ttest('profesor: promedio segun bloque horario', first, second, 'grupo', ['1_2 y 3_4', '5_6 y 7_8'], tex=tex)
 
 #promedio segun rendimiento academico
-grades = [o.getMean('grades') for o in la.people if int(o._id) != 0]
+grades = [o.getMean('grades') for o in la.people if o._id in [str(i+1).zfill(2) for i in range(36)]]
 
 mean = np.mean(grades)
 obsBelow = [i+1 for i in range(len(grades)) if grades[i] <= mean]
@@ -189,7 +209,7 @@ above = [l.interaction for l in la.looks if int(l.observer._id) in obsAbove]
 print_ttest('alumnos tercio con peores notas versus tercio con mejores notas', below, above, 'promedio de notas', ['Bajo', 'Alto'], tex=tex)
 
 #promedio segun evaluacion de companeros
-evs = [o.getMean('evaluation') for o in la.people if int(o._id) != 0]
+evs = [o.getMean('evaluation') for o in la.people if o._id in [str(i+1).zfill(2) for i in range(36)]]
 
 mean = np.mean([e for e in evs if not (e is None or np.isnan(e))])
 obsBelow = [i+1 for i in range(len(evs)) if evs[i] <= mean]
@@ -220,7 +240,7 @@ maleArts = [l.interaction for l in la.looks if int(l.observer._id) != 0 and int(
 print_ttest('interacciones segun sexo en artes', femaleArts, maleArts, 'sexo', ['Femenino', 'Masculino'], tex=tex)
 
 #interacciones en matematicas segun nivel en matematicas
-mathGrades = [o.grades[5] for o in la.people if int(o._id) != 0]
+mathGrades = [o.grades[5] for o in la.people if o._id in [str(i+1).zfill(2) for i in range(36)]]
 
 score1 = stats.scoreatpercentile(mathGrades, 33)
 score2 = stats.scoreatpercentile(mathGrades, 67)

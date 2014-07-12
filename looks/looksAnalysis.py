@@ -162,6 +162,8 @@ class video(object):
             delta = self.clips[0].duration + self.clips[1].duration
         elif part == 'd':
             delta = self.clips[0].duration + self.clips[1].duration + self.clips[2].duration
+        elif part == 'e':
+            delta = self.clips[0].duration + self.clips[1].duration + self.clips[2].duration + self.clips[3].duration
         delta = timedelta(seconds=delta)
         return self.date_time + delta
 
@@ -307,7 +309,7 @@ class looksAnalysis(object):
                         while dt < dt1:
                             dts.append((dt, dt+delta))
                             dt += delta
-                        interactions = [self.getInteraction2(o, dt0, dt1) for dt0, dt1 in dts]
+                        interactions = [self.getInteraction2(o, dt0, dt1)[0] for dt0, dt1 in dts]
                         midPoint = len(interactions)/2
                         if np.sum(interactions[:midPoint]) > 0:
                             indices = allIndices(prev, blocks)
@@ -353,7 +355,30 @@ class looksAnalysis(object):
         for person in self.people:
             if person._id == _id:
                 return person
+        print "Advertencia: no se ha encontrado a la persona con id" + _id
         return None
+
+    def getVideo(self, videoId):
+        videos = [v for v in self.videos if v._id == videoId]
+        if len(videos)>0:
+            vid = videos[0]
+        else:
+            clips = [clip('a',1800), clip('b',1800), clip('c',1800), clip('d',1800)]
+            date = videoId[:8]
+            block = videoId.split('-')[1]
+            if block == '1':
+                block = '1_2'
+            elif block == '3':
+                block = '3_4'
+            elif block == '5':
+                block = '5_6'
+            elif block == '7':
+                block = '7_8'
+            time = self.getTimes(block)[0].strftime('%H%M%S')
+            date_time = datetime.strptime(date+time, '%Y%m%d%H%M%S')
+            vid = video(_id=videoId, date_time=date_time, clips=clips, duration=7200)
+            print "el video " + videoId + " no ha sido ingresado. Se han usado datos estimativos en su reemplazo."
+        return vid
 
     def setLooks(self, fileList, delta, useVideos=False):
         delta = timedelta(seconds=delta)
@@ -384,7 +409,7 @@ class looksAnalysis(object):
                         for obd in observed:
                             self.looks.append(look(interaction, ob, obd, date_time, block, subject))    
                     else:
-                        self.looks.append(look(interaction, ob, 'None', date_time, block, subject))
+                        self.looks.append(look(interaction, ob, None, date_time, block, subject))
                 date_time += delta
 
     def setExactLooks(self, folderList, frameRate):
@@ -393,7 +418,7 @@ class looksAnalysis(object):
                 folderPath = row.replace('\n','')
                 parts = os.path.split(folderPath)
                 folder = parts[-1]
-                observer, date_time_0 = self.foldername2data(folder)
+                observer, date_time0 = self.foldername2data(folder)
                 for filename in glob.glob(os.path.join(folderPath, '*.jpg')):
                     filename = os.path.split(filename)[-1]
                     delta, observed = self.filename2data(filename, frameRate)
@@ -428,7 +453,7 @@ class looksAnalysis(object):
                 row = row.replace('\n','').split(',')
                 date_time = datetime.strptime(row[col['date']] + ' ' + row[col['time']], '%x %X') #09/26/12 08:30:00
                 _id = row[col['id']]
-                clips = [clip(_id + '_a', row[col['clip_a']]), clip(_id + '_b', row[col['clip_b']]), clip(_id + '_c', row[col['clip_c']]), clip(_id + '_d', row[col['clip_d']])]
+                clips = [clip(_id + '_a', int(row[col['clip_a']])), clip(_id + '_b', int(row[col['clip_b']])), clip(_id + '_c', int(row[col['clip_c']])), clip(_id + '_d', int(row[col['clip_d']]))]
                 observer = self.getPerson(row[col['observer']])
                 self.videos.append(video(_id=_id, date_time=date_time, block=row[col['block']], subject=row[col['subject']], observer=observer, roomPos=row[col['roomPos']], clips=clips, duration=row[col['duration']]))
 
@@ -440,7 +465,7 @@ class looksAnalysis(object):
         fields = folder.split('_')
         videoId = '-'.join([ fields[2][:8], fields[0], fields[3] ])
         date_time = self.getVideo(videoId).getClipDatetime0( '_'.join([ videoId, fields[1] ]) )
-        observer = self.people[int(fields[3])]
+        observer = self.getPerson(fields[3])
         return observer, date_time
 
     def filename2data(self, filename, frameRate):
@@ -450,7 +475,7 @@ class looksAnalysis(object):
         frame = int(fields[5])
         seconds = frame/frameRate
         delta = timedelta(seconds=seconds)
-        observed = self.people[int(fields[6])]
+        observed = self.getPerson(fields[6])
         return delta, observed
 
     def removeDuplicateExactLooks(self):
