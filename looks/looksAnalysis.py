@@ -30,9 +30,10 @@ def removeNones(l):
     return l
 
 class look(object):
-    def __init__(self, interaction=None, observer=None, date_time=None, block=None, subject=None):
+    def __init__(self, interaction=None, observer=None, observed=None, date_time=None, block=None, subject=None):
         self.interaction = interaction
         self.observer = observer
+        self.observed = observed        
         self.date_time = date_time
         self.block = block
         self.subject = subject
@@ -147,6 +148,22 @@ class video(object):
         if self.clips is None:
             self.clips = []
 
+    def getClip(self, clipId):
+        clip = [c for c in self.clips if c._id == clipId]
+        return clip[0]
+
+    def getClipDatetime0(self, clipId):
+        part = clipId.split('_')[-1]
+        if part == 'a':
+            delta = 0
+        elif part == 'b':
+            delta = self.clips[0].duration
+        elif part == 'c':
+            delta = self.clips[0].duration + self.clips[1].duration
+        elif part == 'd':
+            delta = self.clips[0].duration + self.clips[1].duration + self.clips[2].duration
+        delta = timedelta(seconds=delta)
+        return self.date_time + delta
 
 class looksAnalysis(object):
     def __init__(self, filename=None):
@@ -316,11 +333,12 @@ class looksAnalysis(object):
         return ans
 
     def getInteraction2(self, o, dt0, dt1):
-        obs = self.getObsFromExactLooks(dt0, dt1)
-        if o in obs:
-            return 1
+        observed = [ el.observed for el in self.exactLooks if el.date_time >= dt0 and el.date_time < dt1 and el.observer == o ]
+        if len(observed) > 0:
+            interaction = 1
         else:
-            return 0
+            interaction = 0
+        return (interaction, observed)
 
     def getSubject(self, date_time):
         return self._timetable.getSubject(date_time)
@@ -360,9 +378,13 @@ class looksAnalysis(object):
             date_time = date_times[0]
             for obs, block in zip(observers, blocks):
                 for ob in obs:
-                    interaction = self.getInteraction2(ob, date_time, date_time+delta)
+                    (interaction, observed) = self.getInteraction2(ob, date_time, date_time+delta)
                     subject = self.getSubject(date_time)
-                    self.looks.append(look(interaction, ob, date_time, block, subject))
+                    if len(observed)>0:
+                        for obd in observed:
+                            self.looks.append(look(interaction, ob, obd, date_time, block, subject))    
+                    else:
+                        self.looks.append(look(interaction, ob, 'None', date_time, block, subject))
                 date_time += delta
 
     def setExactLooks(self, folderList, frameRate):
@@ -374,11 +396,12 @@ class looksAnalysis(object):
                 observer, date_time_0 = self.foldername2data(folder)
                 for filename in glob.glob(os.path.join(folderPath, '*.jpg')):
                     filename = os.path.split(filename)[-1]
-                    date_time = self.filename2data(filename, frameRate)
+                    delta, observed = self.filename2data(filename, frameRate)
+                    date_time = date_time0 + delta
                     block = self.getBlock(date_time.time())
                     subject = self.getSubject(date_time)
-                    self.exactLooks.append(look(1, observer, date_time, block, subject))
-        self.removeDuplicateExactLooks() #aparecen cuando no se distingue a quien se vio
+                    self.exactLooks.append(look(1, observer, observed, date_time, block, subject))
+        self.removeDuplicateExactLooks() #aparecen cuando no se distingue a quien se vio o cuando los dos clasificadores detectaron la cara
 
 
     def setPeople(self, filename):
@@ -415,30 +438,33 @@ class looksAnalysis(object):
     def foldername2data(self, folder):
         #ejemplo: 3_b_20121026100315_11_Nayareth.AVI
         fields = folder.split('_')
-        date_time = datetime.strptime(fields[2], '%Y%m%d%H%M%S')
+        videoId = '-'.join([ fields[2][:8], fields[0], fields[3] ])
+        date_time = self.getVideo(videoId).getClipDatetime0( '_'.join([ videoId, fields[1] ]) )
         observer = self.people[int(fields[3])]
         return observer, date_time
 
     def filename2data(self, filename, frameRate):
-        #ejemplo: 1_a_20121002082002_Nayareth.AVI_5_29040
+        #ejemplo: 1_a_20121002082002_Nayareth.AVI_5_29040_29_VictorPoblete
         fields = filename.replace('.jpg','').split('_')
-        dt0 = datetime.strptime(fields[2], '%Y%m%d%H%M%S')
+        #dt0 = datetime.strptime(fields[2], '%Y%m%d%H%M%S')
         frame = int(fields[5])
         seconds = frame/frameRate
         delta = timedelta(seconds=seconds)
-        return dt0+delta
+        observed = self.people[int(fields[6])]
+        return delta, observed
 
     def removeDuplicateExactLooks(self):
-        l = [(el.interaction, el.observer, el.date_time, el.block, el.subject) for el in self.exactLooks]
+        l = [(el.interaction, el.observer, el.observed, el.date_time, el.block, el.subject) for el in self.exactLooks]
         l = unique(l)
         self.exactLooks = []
         for t in l:
             auxLook = look()
             auxLook.interaction = t[0]
             auxLook.observer = t[1]
-            auxLook.date_time = t[2]
-            auxLook.block = t[3]
-            auxLook.subject = t[4]
+            auxLook.observed = t[2]
+            auxLook.date_time = t[3]
+            auxLook.block = t[4]
+            auxLook.subject = t[5]
             self.exactLooks.append(auxLook)
 
     def toCSV(self, filename, variable, attributes, headers):
