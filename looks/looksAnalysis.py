@@ -148,6 +148,9 @@ class video(object):
         if self.clips is None:
             self.clips = []
 
+    def getEnd(self):
+        return self.date_time + self.duration
+
     def getClip(self, clipId):
         clip = [c for c in self.clips if c._id == clipId]
         return clip[0]
@@ -177,6 +180,13 @@ class looksAnalysis(object):
 
         if not filename is None:
             self.load(filename)
+
+    def id2int(self, strId):
+        try:
+            intId = int(strId)
+        except:
+            intId = 99999
+        return intId
 
     def matlab2numpy(self, filename, sparse=False):
         with open(filename,'r') as f:
@@ -263,10 +273,7 @@ class looksAnalysis(object):
             observers = []
             while date_time0 < date_time1:
                 block = self.getBlock(date_time0.time())
-                O = []
-                for video in self.videos:
-                    if date_time0.date() == video.date_time.date() and block == video.block:
-                        O.append(video.observer)
+                O = [v.observer for v in self.videos if date_time0 >= v.date_time and date_time0 < v.getEnd()]
                 observers.append(O)
                 blocks.append(block)
                 date_time0 += delta
@@ -355,7 +362,7 @@ class looksAnalysis(object):
         for person in self.people:
             if person._id == _id:
                 return person
-        print "Advertencia: no se ha encontrado a la persona con id" + _id
+        print "Advertencia: no se ha encontrado a la persona con id " + _id
         return None
 
     def getVideo(self, videoId):
@@ -396,7 +403,7 @@ class looksAnalysis(object):
                         self.looks.append(look(interaction, self.people[hId], date_time, bl, subject))
                     date_time += delta
 
-    def setLooks2(self, datetimeList, delta, useVideos=False):
+    def setLooks2(self, datetimeList, delta, useVideos=True):
         delta = timedelta(seconds=delta)
         for date_times in datetimeList:
             observers, blocks = self.getObservers(date_times[0], date_times[1], delta, useVideos)
@@ -428,6 +435,24 @@ class looksAnalysis(object):
                     self.exactLooks.append(look(1, observer, observed, date_time, block, subject))
         self.removeDuplicateExactLooks() #aparecen cuando no se distingue a quien se vio o cuando los dos clasificadores detectaron la cara
 
+    def getMatrix(self, date_time0, date_time1):
+        m = sp.dok_matrix((37,38))
+        for l in [l for l in self.looks if l.interaction == 1 and l.date_time >= date_time0 and l.date_time < date_time1]:
+            i = min([ self.id2int(l.observer._id), 37 ])
+            j = min([ self.id2int(l.observed._id), 37 ])
+            m[(i,j)] += 1
+            #falta normalizar
+        return m
+
+    def printMatrix(self, date_time0, date_time1):
+        m = self.getMatrix(date_time0, date_time1)
+        filename = date_time0.strftime('%Y%m%d%H%M%S') + '_' + date_time1.strftime('%Y%m%d%H%M%S') + '.csv'
+        with open(filename, 'w') as f:
+            line = ',' + ','.join([ str(i) for i in range(m.shape[1]) ]) + '\n'
+            f.write(line)
+            for j in range(m.shape[0]):
+                line = str(j) + ',' + ','.join([ str(n) for n in m.getrow(j).todense().tolist()[0] ]) + '\n'
+                f.write(line)
 
     def setPeople(self, filename):
         with open(filename,'r') as f:
@@ -447,15 +472,16 @@ class looksAnalysis(object):
         self._timetable.setTT(fileTT)
 
     def setVideos(self, filename):
-        col = {'id':0, 'date':4, 'time':16, 'block':6, 'subject':7, 'observer':8, 'roomPos':12, 'clip_a':17, 'clip_b':18, 'clip_c':19, 'clip_d':20, 'duration':21}
+        col = {'id':0, 'date':4, 'time':16, 'block':6, 'subject':7, 'observer':8, 'roomPos':12, 'clip_a':17, 'clip_b':18, 'clip_c':19, 'clip_d':20, 'clip_e':21, 'duration':22}
         with open(filename, 'r') as f:
             for row in f.readlines()[1:]:
                 row = row.replace('\n','').split(',')
                 date_time = datetime.strptime(row[col['date']] + ' ' + row[col['time']], '%x %X') #09/26/12 08:30:00
                 _id = row[col['id']]
-                clips = [clip(_id + '_a', int(row[col['clip_a']])), clip(_id + '_b', int(row[col['clip_b']])), clip(_id + '_c', int(row[col['clip_c']])), clip(_id + '_d', int(row[col['clip_d']]))]
+                clips = [clip(_id + '_a', int(row[col['clip_a']])), clip(_id + '_b', int(row[col['clip_b']])), clip(_id + '_c', int(row[col['clip_c']])), clip(_id + '_d', int(row[col['clip_d']])), clip(_id + '_e', int(row[col['clip_e']]))]
                 observer = self.getPerson(row[col['observer']])
-                self.videos.append(video(_id=_id, date_time=date_time, block=row[col['block']], subject=row[col['subject']], observer=observer, roomPos=row[col['roomPos']], clips=clips, duration=row[col['duration']]))
+                duration = timedelta(seconds=int(row[col['duration']]))
+                self.videos.append(video(_id=_id, date_time=date_time, block=row[col['block']], subject=row[col['subject']], observer=observer, roomPos=row[col['roomPos']], clips=clips, duration=duration))
 
     def setEvs(self, l):
         return [str2float(s) for s in l]
