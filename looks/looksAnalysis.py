@@ -177,6 +177,7 @@ class looksAnalysis(object):
         self.people = []
         self._timetable = timetable()
         self.videos = []
+        self.absences = {}
 
         if not filename is None:
             self.load(filename)
@@ -437,22 +438,41 @@ class looksAnalysis(object):
 
     def getMatrix(self, date_time0, date_time1):
         m = sp.dok_matrix((37,38))
-        for l in [l for l in self.looks if l.interaction == 1 and l.date_time >= date_time0 and l.date_time < date_time1]:
+        t = sp.dok_matrix((37,38))
+        d = sp.dok_matrix((37,38))
+        looks = [l for l in self.looks if date_time0 <= l.date_time < date_time1]
+        for l in looks:
             i = min([ self.id2int(l.observer._id), 37 ])
-            j = min([ self.id2int(l.observed._id), 37 ])
-            m[(i,j)] += 1
-            #falta normalizar
-        return m
+            if l.interaction == 1:
+                j = min([ self.id2int(l.observed._id), 37 ])
+                m[(i,j)] += 1
+            studentIds = [p._id for p in self.people if self.id2int(p._id) < 37]
+            presentStudents = [self.id2int(sId) for sId in studentIds if self.isPresent(sId, l.date_time)]
+            presentStudents.append(37)
+            for k in presentStudents:
+                t[(i,k)] += 1
+            if l.interaction == 1 and not j in presentStudents:
+                print 'error: ' + l.observer._id + ' mira a ' + l.observed._id + ' pero no esta presente en ' + str(l.date_time)
+        #d = self.divide(m, t)
+        d = (m.todense()/t.todense())*100
+        return d, m, t
 
-    def printMatrix(self, date_time0, date_time1):
-        m = self.getMatrix(date_time0, date_time1)
-        filename = date_time0.strftime('%Y%m%d%H%M%S') + '_' + date_time1.strftime('%Y%m%d%H%M%S') + '.csv'
+    def printMatrix(self, date_time0, date_time1, folder='./'):
+        d, m, t = self.getMatrix(date_time0, date_time1)
+        filename = folder + date_time0.strftime('%Y%m%d%H%M%S') + '_' + date_time1.strftime('%Y%m%d%H%M%S') + '.csv'
         with open(filename, 'w') as f:
-            line = ',' + ','.join([ str(i) for i in range(m.shape[1]) ]) + '\n'
+            line = ',' + ','.join([ str(i) for i in range(d.shape[1]) ]) + '\n'
             f.write(line)
-            for j in range(m.shape[0]):
-                line = str(j) + ',' + ','.join([ str(n) for n in m.getrow(j).todense().tolist()[0] ]) + '\n'
+            for j in range(d.shape[0]):
+                line = str(j) + ',' + ','.join([ '{:3.2f}'.format(n) for n in d[j].tolist()[0] ]) + '\n'
                 f.write(line)
+
+    def divide(self, m1, m2):
+        d = m1/m2
+        ks = [k for k in m2.keys() if not k in m1.keys()]
+        for k in ks:
+            d[k] = 0
+        return d
 
     def setPeople(self, filename):
         with open(filename,'r') as f:
@@ -485,6 +505,26 @@ class looksAnalysis(object):
 
     def setEvs(self, l):
         return [str2float(s) for s in l]
+
+    def setAbsences(self, filename):
+        with open(filename, 'r') as f:
+            blocks = f.readline().replace('\n','').split(',')[1:]
+            for row in f:
+                row = row.replace('\n','').split(',')
+                day = row[0]
+                self.absences[day] = {}
+                for i in range(len(row[1:])):
+                    self.absences[day][blocks[i]] = row[i+1].split('-')
+
+    def isPresent(self, personId, date_time):
+        day = date_time.strftime('%Y%m%d')
+        block = self.getBlock(date_time.time())
+        if personId in self.absences[day][block]:
+            ans = 0
+        else:
+            ans = 1
+        return ans
+
 
     def foldername2data(self, folder):
         #ejemplo: 3_b_20121026100315_11_Nayareth.AVI
