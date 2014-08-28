@@ -274,7 +274,7 @@ class looksAnalysis(object):
             observers = []
             while date_time0 < date_time1:
                 block = self.getBlock(date_time0.time())
-                O = [v.observer for v in self.videos if date_time0 >= v.date_time and date_time0 < v.getEnd()]
+                O = [v.observer for v in self.videos if v.date_time <= date_time0 < v.getEnd()]
                 observers.append(O)
                 blocks.append(block)
                 date_time0 += delta
@@ -343,7 +343,8 @@ class looksAnalysis(object):
         return ans
 
     def getInteraction2(self, o, dt0, dt1):
-        observed = [ el.observed for el in self.exactLooks if el.date_time >= dt0 and el.date_time < dt1 and el.observer == o ]
+        observed = [ el.observed for el in self.exactLooks if dt0 <= el.date_time < dt1 and el.observer == o ]
+        observed = unique(observed)
         if len(observed) > 0:
             interaction = 1
         else:
@@ -434,19 +435,27 @@ class looksAnalysis(object):
                     block = self.getBlock(date_time.time())
                     subject = self.getSubject(date_time)
                     self.exactLooks.append(look(1, observer, observed, date_time, block, subject))
-        self.removeDuplicateExactLooks() #aparecen cuando no se distingue a quien se vio o cuando los dos clasificadores detectaron la cara
+        self.removeDuplicatedExactLooks() #aparecen cuando no se distingue a quien se vio o cuando los dos clasificadores detectaron la cara
 
-    def getMatrix(self, date_time0, date_time1):
+    def getMatrix(self, date_time0, date_time1, filterBy=(), groupBy=''):
+        looks = [l for l in self.looks if date_time0 <= l.date_time < date_time1]
+        for l in looks:
+            if l.interaction ==1 and l.observed._id in ['SIN', 'MARCADOR', 'FOTO']:
+                l.interaction = 0
+        if len(filterBy) > 0:
+            attribute = filterBy[0]
+            values = filterBy[1]
+            exec 'looks = [l for l in looks if l.' + attribute + ' in values]'
+
         m = sp.dok_matrix((37,38))
         t = sp.dok_matrix((37,38))
         d = sp.dok_matrix((37,38))
-        looks = [l for l in self.looks if date_time0 <= l.date_time < date_time1]
+        studentIds = [p._id for p in self.people if self.id2int(p._id) < 37]
         for l in looks:
             i = min([ self.id2int(l.observer._id), 37 ])
             if l.interaction == 1:
                 j = min([ self.id2int(l.observed._id), 37 ])
                 m[(i,j)] += 1
-            studentIds = [p._id for p in self.people if self.id2int(p._id) < 37]
             presentStudents = [self.id2int(sId) for sId in studentIds if self.isPresent(sId, l.date_time)]
             presentStudents.append(37)
             for k in presentStudents:
@@ -455,11 +464,23 @@ class looksAnalysis(object):
                 print 'error: ' + l.observer._id + ' mira a ' + l.observed._id + ' pero no esta presente en ' + str(l.date_time)
         #d = self.divide(m, t)
         d = (m.todense()/t.todense())*100
+        
+        if groupBy == 'gender':
+            males = [self.id2int(s._id) for s in self.people if 0 < self.id2int(s._id) < 37 and s.gender == '1']
+            females = [self.id2int(s._id) for s in self.people if self.id2int(s._id) < 37 and s.gender == '2']
+            m = np.c_[m[:,0].todense(), m[:,males].sum(1), m[:,females].sum(1), m[:,37].todense()]
+            t = np.c_[t[:,0].todense(), t[:,37].todense(), t[:,37].todense(), t[:,37].todense()]
+            d = (m/t)*100
         return d, m, t
 
-    def printMatrix(self, date_time0, date_time1, folder='./'):
-        d, m, t = self.getMatrix(date_time0, date_time1)
-        filename = folder + date_time0.strftime('%Y%m%d%H%M%S') + '_' + date_time1.strftime('%Y%m%d%H%M%S') + '.csv'
+    def printMatrix(self, date_time0, date_time1, folder='./', filterBy=(), groupBy=''):
+        d, m, t = self.getMatrix(date_time0, date_time1, filterBy, groupBy)
+        filename = folder + date_time0.strftime('%Y%m%d%H%M%S') + '_' + date_time1.strftime('%Y%m%d%H%M%S')
+        if len(filterBy) > 0:
+            filename += '_fb-' + filterBy[0] + '-' + '-'.join(filterBy[1])
+        if groupBy != '':
+            filename += '_gb-' + groupBy
+        filename += '.csv'
         with open(filename, 'w') as f:
             line = ',' + ','.join([ str(i) for i in range(d.shape[1]) ]) + '\n'
             f.write(line)
@@ -544,7 +565,7 @@ class looksAnalysis(object):
         observed = self.getPerson(fields[6])
         return delta, observed
 
-    def removeDuplicateExactLooks(self):
+    def removeDuplicatedExactLooks(self):
         l = [(el.interaction, el.observer, el.observed, el.date_time, el.block, el.subject) for el in self.exactLooks]
         l = unique(l)
         self.exactLooks = []
@@ -557,6 +578,21 @@ class looksAnalysis(object):
             auxLook.block = t[4]
             auxLook.subject = t[5]
             self.exactLooks.append(auxLook)
+
+    def showPhotos(self, facesPath, date_time0, observerId, observedId):
+        from PIL import Image
+        block = self.getBlock(date_time0.time())[0]
+        if block == 'r' or block == 'a':
+            #si es recreo o almuerzo, considero el bloque anterior
+            block = self.getBlock((datetime.combine(datetime.now().date(),self.getTimes(self.getBlock(date_time0.time()))[0]) - timedelta(seconds=120)).time())[0]
+        date = date_time0.strftime('%Y%m%d')
+        folderPattern = block + '_*_' + date + '*_' + observerId + '_*'
+        filePattern = block + '_*_' + date + '*_*_*_*_' + observedId + '_*.jpg'
+        pattern = os.path.join(folderPattern, filePattern)
+        for filename in glob.glob(os.path.join(facesPath, pattern)):
+            print 'displaying ' + filename
+            img = Image.open(filename)
+            img.show()
 
     def toCSV(self, filename, variable, attributes, headers):
         with open(filename, 'w') as f:
